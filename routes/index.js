@@ -9,8 +9,6 @@ router.use("/items", itemRouter);
 router.use("/items", likeRouter);
 
 // Defensive code
-router.use((req, res) => {
-  return res.status(notFound.code).send(notFound.text)
-})
+router.use((req, res) => res.status(notFound.code).send(notFound.text))
 
 module.exports = router;
