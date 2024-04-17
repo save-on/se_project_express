@@ -1,8 +1,8 @@
-const Item = require("../models/clothingItem");
+const ClothingItem = require("../models/clothingItem");
 const { success, created, badRequest, notFound, internalError } = require("../utils/errors");
 
 const getItems = (req, res) => {
-  Item.find({})
+  ClothingItem.find({})
     .then(items => res.status(success).send(items))
     .catch((err) => {
       console.error(err);
@@ -12,7 +12,7 @@ const getItems = (req, res) => {
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body
-  Item.create({ name, weather, imageUrl, owner: req.user._id })
+  ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
     .then(item => res.status(created).send({data:item}))
     .catch((err) => {
       console.error(err);
@@ -24,7 +24,7 @@ const createItem = (req, res) => {
 };
 
 const deleteItem = (req, res) => {
-  Item.findByIdAndRemove(req.params.itemId)
+  ClothingItem.findByIdAndRemove(req.params.itemId)
     .orFail()
     .then((item) => res.status(success).send(item))
     .catch((err) => {

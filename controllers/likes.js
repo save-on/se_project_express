@@ -1,8 +1,8 @@
-const Item = require("../models/clothingItem");
+const ClothingItem = require("../models/clothingItem");
 const { success, badRequest, internalError, notFound } = require("../utils/errors");
 
 const likeItem = (req, res) => {
-  Item.findByIdAndUpdate(
+  ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $addToSet: {likes: req.user._id} },
     { new: true }
@@ -22,7 +22,7 @@ const likeItem = (req, res) => {
 }
 
 const dislikeItem = (req, res) => {
-  Item.findByIdAndUpdate(
+  ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $pull: { likes: req.user._id } },
     { new: true }
