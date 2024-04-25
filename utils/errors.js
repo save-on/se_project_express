@@ -3,20 +3,27 @@ const created = 201;
 const badRequest = {
   code: 400,
   text: {
-    message: "The request could not be processed due to invalid input data."
-  }
+    message: "The request could not be processed due to invalid input data.",
+  },
 };
 const notFound = {
   code: 404,
   text: {
-    message: "The Requested resource was not found."
-  }
+    message: "The Requested resource was not found.",
+  },
 };
 const internalError = {
   code: 500,
   text: {
-    message: "An unexpected internal problem has occurred, please try again later"
-  }
+    message:
+      "An unexpected internal problem has occurred, please try again later",
+  },
+};
+const unauthorized = {
+  code: 401,
+  text: {
+    message: "Email address already exists, please try again",
+  },
 };
 
 module.exports = {
@@ -24,5 +31,6 @@ module.exports = {
   created,
   badRequest,
   notFound,
-  internalError
-}
+  internalError,
+  unauthorized,
+};
