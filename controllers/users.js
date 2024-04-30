@@ -5,7 +5,7 @@ const {
   badRequest,
   notFound,
   internalError,
-  unauthorized,
+  conflict,
 } = require("../utils/errors");
 const { jwtToken } = require("../utils/config");
 
@@ -39,24 +39,30 @@ const getUser = (req, res) => {
 
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
-  const hash = bcrypt
+  bcrypt
     .hash(password, 10)
     .then((hash) =>
       User.create({
+        email,
         name,
         avatar,
-        email,
         password: hash,
       })
     )
-    .then((user) => res.status(created).send(user))
+    .then(() => {
+      return res.status(created).send({
+        email: email,
+        name: name,
+        avatar: avatar,
+      });
+    })
     .catch((err) => {
       console.error(err);
+      if (err.name === "MongoServerError") {
+        return res.status(conflict.code).send(conflict.text);
+      }
       if (err.name === "ValidationError") {
         return res.status(badRequest.code).send(badRequest.text);
-      }
-      if (err.name === "MongoServerError") {
-        return res.status(unauthorized.code).send(unauthorized.text);
       }
       return res.status(internalError.code).send(internalError.text);
     });
@@ -69,14 +75,39 @@ const login = (req, res) => {
       const token = jwt.sign({ _id: user._id }, jwtToken, {
         expiresIn: "7d",
       });
-      res.send({ token });
+      return res.status(success).send({ token });
     })
     .catch((err) => {
       console.error(err);
-      res
-        .status(unauthorized.code)
-        .send({ message: "Incorrect email or password" }); // come back to fix
+      return res.status(badRequest.code).send({ message: err.message });
     });
 };
 
-module.exports = { getUsers, getUser, createUser, login };
+const getCurrentUser = (req, res) => {
+  const { _id } = req.user;
+  User.findById({ _id })
+    .then((user) => res.status(success).send(user))
+    .catch((err) => {
+      console.error(err);
+      return res.status(internalError.code).send(internalError.text);
+    });
+};
+
+const updateCurrentUser = (req, res) => {
+  const { _id } = req.user;
+  User.findByIdAndUpdate(_id, req.body, { runValidators: true })
+    .then((user) => res.status(success).send(user))
+    .catch((err) => {
+      console.error(err);
+      return res.status(internalError.code).send(internalError.text);
+    });
+};
+
+module.exports = {
+  getUsers,
+  getUser,
+  createUser,
+  login,
+  getCurrentUser,
+  updateCurrentUser,
+};

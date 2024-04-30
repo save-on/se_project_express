@@ -22,6 +22,13 @@ const internalError = {
 const unauthorized = {
   code: 401,
   text: {
+    message:
+      "Unauthorized, you must provide valid credentials to access this resource",
+  },
+};
+const conflict = {
+  code: 409,
+  text: {
     message: "Email address already exists, please try again",
   },
 };
@@ -33,4 +40,5 @@ module.exports = {
   notFound,
   internalError,
   unauthorized,
+  conflict,
 };
