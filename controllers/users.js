@@ -86,7 +86,15 @@ const login = (req, res) => {
 const getCurrentUser = (req, res) => {
   const { _id } = req.user;
   User.findById({ _id })
-    .then((user) => res.status(success).send(user))
+    .then((user) => {
+      const { name, avatar, email, __v } = user;
+      return res.status(success).send({
+        name,
+        avatar,
+        email,
+        __v,
+      });
+    })
     .catch((err) => {
       console.error(err);
       return res.status(internalError.code).send(internalError.text);
@@ -95,8 +103,16 @@ const getCurrentUser = (req, res) => {
 
 const updateCurrentUser = (req, res) => {
   const { _id } = req.user;
-  User.findByIdAndUpdate(_id, req.body, { runValidators: true })
-    .then((user) => res.status(success).send(user))
+  User.findByIdAndUpdate(_id, req.body, { new: true, runValidators: true })
+    .then((user) => {
+      const { name, avatar, email, __v } = user;
+      return res.status(success).send({
+        name,
+        avatar,
+        email,
+        __v,
+      });
+    })
     .catch((err) => {
       console.error(err);
       return res.status(internalError.code).send(internalError.text);
