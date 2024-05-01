@@ -9,7 +9,7 @@ const extractBearerToken = (authorization) => {
   return authorization.replace("Bearer ", "");
 };
 
-const auth = (req, res, next) => {
+function auth(req, res, next) {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith("Bearer ")) {
@@ -25,13 +25,12 @@ const auth = (req, res, next) => {
   try {
     payload = jwt.verify(token, jwtToken);
   } catch (err) {
-    // console.error(err);
     return handleAuthError(res);
   }
 
   req.user = payload;
-  // console.log(payload);
+
   next();
-};
+}
 
 module.exports = auth;
