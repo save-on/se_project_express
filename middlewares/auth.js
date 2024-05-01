@@ -1,13 +1,11 @@
 const jwt = require("jsonwebtoken");
 const { jwtToken } = require("../utils/config");
 
-const handleAuthError = (res) => {
+const handleAuthError = (res) =>
   res.status(401).send({ message: "Authorization required" });
-};
 
-const extractBearerToken = (authorization) => {
-  return authorization.replace("Bearer ", "");
-};
+const extractBearerToken = (authorization) =>
+  authorization.replace("Bearer ", "");
 
 function auth(req, res, next) {
   const { authorization } = req.headers;
@@ -17,8 +15,6 @@ function auth(req, res, next) {
   }
 
   const token = extractBearerToken(authorization);
-
-  console.log(extractBearerToken("Bearer 03287302897023987"));
 
   let payload;
 

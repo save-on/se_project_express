@@ -1,3 +1,5 @@
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const {
   success,
@@ -8,9 +10,6 @@ const {
   conflict,
 } = require("../utils/errors");
 const { jwtToken } = require("../utils/config");
-
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 
 const getUsers = (req, res) => {
   User.find({})
@@ -49,13 +48,13 @@ const createUser = (req, res) => {
         password: hash,
       })
     )
-    .then(() => {
-      return res.status(created).send({
-        email: email,
-        name: name,
-        avatar: avatar,
-      });
-    })
+    .then(() =>
+      res.status(created).send({
+        email,
+        name,
+        avatar,
+      })
+    )
     .catch((err) => {
       console.error(err);
       if (err.name === "MongoServerError") {
