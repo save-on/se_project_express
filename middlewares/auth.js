@@ -8,6 +8,7 @@ const handleAuthError = (res) => {
 const extractBearerToken = (authorization) => {
   return authorization.replace("Bearer ", "");
 };
+
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
 
@@ -17,16 +18,19 @@ const auth = (req, res, next) => {
 
   const token = extractBearerToken(authorization);
 
+  console.log(extractBearerToken("Bearer 03287302897023987"));
+
   let payload;
 
   try {
     payload = jwt.verify(token, jwtToken);
   } catch (err) {
+    // console.error(err);
     return handleAuthError(res);
   }
 
   req.user = payload;
-
+  // console.log(payload);
   next();
 };
 
