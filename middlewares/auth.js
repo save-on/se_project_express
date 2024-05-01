@@ -7,7 +7,7 @@ const handleAuthError = (res) =>
 const extractBearerToken = (authorization) =>
   authorization.replace("Bearer ", "");
 
-function auth(req, res, next) {
+const auth = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith("Bearer ")) {
@@ -26,7 +26,7 @@ function auth(req, res, next) {
 
   req.user = payload;
 
-  next();
-}
+  return next();
+};
 
 module.exports = auth;
