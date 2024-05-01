@@ -30,15 +30,20 @@ const createItem = (req, res) => {
 };
 
 const deleteItem = (req, res) => {
-  console.log(req);
-  ClothingItem.findByIdAndRemove(req.params.itemId)
-    .orFail()
-    .then((item) => res.status(success).send(item))
-    .catch((err) => {
-      console.error(err);
-      if (err.name === "DocumentNotFoundError") {
+  const { itemId } = req.params;
+  ClothingItem.findByIdAndRemove(itemId)
+    .then((item) => {
+      console.log(item);
+      if (!item) {
         return res.status(notFound.code).send(notFound.text);
       }
+      if (!item.owner.equals(req.user._id)) {
+        return res.status(403).send({ message: "Forbidden" });
+      }
+      return res.status(success).send(item);
+    })
+    .catch((err) => {
+      console.error(err);
       if (err.name === "CastError") {
         return res.status(badRequest.code).send(badRequest.text);
       }
