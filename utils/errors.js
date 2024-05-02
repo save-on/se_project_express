@@ -1,5 +1,5 @@
-const success = 200;
 const created = 201;
+
 const badRequest = {
   code: 400,
   text: {
@@ -33,12 +33,19 @@ const conflict = {
   },
 };
 
+const forbidden = {
+  code: 403,
+  text: {
+    message: "Access Forbidden, you are not authorized to perform this action",
+  },
+};
+
 module.exports = {
-  success,
   created,
   badRequest,
   notFound,
   internalError,
   unauthorized,
   conflict,
+  forbidden,
 };
