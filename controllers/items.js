@@ -37,7 +37,7 @@ const deleteItem = (req, res) => {
       if (String(item.owner) !== req.user._id) {
         return res.status(forbidden.code).send(forbidden.text);
       }
-      item
+      return item
         .deleteOne()
         .then(() => res.send({ message: "Item deleted successfully" }));
     })

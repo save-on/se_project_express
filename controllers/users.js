@@ -60,6 +60,7 @@ const login = (req, res) => {
       }
       return res.status(internalError.code).send(internalError.text);
     });
+  return res.status(internalError.code).send(internalError.text);
 };
 
 const getCurrentUser = (req, res) => {
