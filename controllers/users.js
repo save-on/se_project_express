@@ -46,7 +46,7 @@ const login = (req, res) => {
   if (!email || !password) {
     return res.status(badRequest.code).send(badRequest.text);
   }
-  User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, jwtToken, {
         expiresIn: "7d",
@@ -60,7 +60,6 @@ const login = (req, res) => {
       }
       return res.status(internalError.code).send(internalError.text);
     });
-  return res.status(internalError.code).send(internalError.text);
 };
 
 const getCurrentUser = (req, res) => {
