@@ -51,7 +51,7 @@ const login = (req, res) => {
       const token = jwt.sign({ _id }, jwtToken, {
         expiresIn: "7d",
       });
-      return res.send({ token, name, avatar });
+      return res.send({ token, name, avatar, _id });
     })
     .catch((err) => {
       console.error(err);
