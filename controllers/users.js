@@ -47,11 +47,11 @@ const login = (req, res) => {
     return res.status(badRequest.code).send(badRequest.text);
   }
   return User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign({ _id: user._id }, jwtToken, {
+    .then(({ _id, name, avatar }) => {
+      const token = jwt.sign({ _id }, jwtToken, {
         expiresIn: "7d",
       });
-      return res.send({ token });
+      return res.send({ token, name, avatar });
     })
     .catch((err) => {
       console.error(err);
