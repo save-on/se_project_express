@@ -1,12 +1,7 @@
 const ClothingItem = require("../models/clothingItem");
-const {
-  created,
-  badRequest,
-  internalError,
-  notFound,
-} = require("../utils/errors");
+const { created, BadRequestError, NotFoundError } = require("../utils/errors");
 
-const likeItem = (req, res) => {
+const likeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $addToSet: { likes: req.user._id } },
@@ -17,16 +12,20 @@ const likeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(notFound.code).send(notFound.text);
+        next(new NotFoundError("The Requested resource was not found."));
       }
       if (err.name === "CastError") {
-        return res.status(badRequest.code).send(badRequest.text);
+        next(
+          new BadRequestError(
+            "The request could not be processed due to invalid input data."
+          )
+        );
       }
-      return res.status(internalError.code).send(internalError.text);
+      next(err);
     });
 };
 
-const dislikeItem = (req, res) => {
+const dislikeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $pull: { likes: req.user._id } },
@@ -37,12 +36,16 @@ const dislikeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(notFound.code).send(notFound.text);
+        next(new NotFoundError("The Requested resource was not found."));
       }
       if (err.name === "CastError") {
-        return res.status(badRequest.code).send(badRequest.text);
+        next(
+          new BadRequestError(
+            "The request could not be processed due to invalid input data."
+          )
+        );
       }
-      return res.status(internalError.code).send(internalError.text);
+      next(err);
     });
 };
 

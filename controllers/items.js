@@ -1,41 +1,46 @@
 const ClothingItem = require("../models/clothingItem");
 const {
   created,
-  badRequest,
-  internalError,
-  forbidden,
-  notFound,
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
 } = require("../utils/errors");
 
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   ClothingItem.find({})
     .then((items) => res.send(items))
     .catch((err) => {
       console.error(err);
-      return res.status(internalError.code).send(internalError.text);
+      next(err);
     });
 };
 
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => res.status(created).send({ data: item }))
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(badRequest.code).send(badRequest.text);
+        next(
+          new BadRequestError(
+            "The request could not be processed due to invalid input data."
+          )
+        );
       }
-      return res.status(internalError.code).send(internalError.text);
+      next(err);
     });
 };
 
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
   ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
       if (String(item.owner) !== req.user._id) {
-        return res.status(forbidden.code).send(forbidden.text);
+        throw new ForbiddenError(
+          "Access Forbidden, you are not authorized to perform this action"
+        );
       }
       return item
         .deleteOne()
@@ -44,12 +49,16 @@ const deleteItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
-        return res.status(badRequest.code).send(badRequest.text);
+        next(
+          new BadRequestError(
+            "The request could not be processed due to invalid input data."
+          )
+        );
       }
       if (err.name === "DocumentNotFoundError") {
-        return res.status(notFound.code).send(notFound.text);
+        next(new NotFoundError("The Requested resource was not found."));
       }
-      return res.status(internalError.code).send(internalError.text);
+      next(err);
     });
 };
 

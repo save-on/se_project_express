@@ -3,14 +3,13 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const {
   created,
-  badRequest,
-  unauthorized,
-  internalError,
-  conflict,
+  BadRequestError,
+  UnauthorizedError,
+  ConflictError,
 } = require("../utils/errors");
 const { jwtToken } = require("../utils/config");
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
   bcrypt
     .hash(password, 10)
@@ -32,19 +31,27 @@ const createUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "MongoServerError") {
-        return res.status(conflict.code).send(conflict.text);
+        next(
+          new ConflictError("Email address already exists, please try again")
+        );
       }
       if (err.name === "ValidationError") {
-        return res.status(badRequest.code).send(badRequest.text);
+        next(
+          new BadRequestError(
+            "The request could not be processed due to invalid input data."
+          )
+        );
       }
-      return res.status(internalError.code).send(internalError.text);
+      next(err);
     });
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return res.status(badRequest.code).send(badRequest.text);
+    throw new BadRequestError(
+      "The request could not be processed due to invalid input data."
+    );
   }
   return User.findUserByCredentials(email, password)
     .then(({ _id, name, avatar }) => {
@@ -56,23 +63,27 @@ const login = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.message === "Incorrect email or password") {
-        return res.status(unauthorized.code).send(unauthorized.text);
+        next(
+          new UnauthorizedError(
+            "Unauthorized, you must provide valid credentials to access this resource"
+          )
+        );
       }
-      return res.status(internalError.code).send(internalError.text);
+      next(err);
     });
 };
 
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   const { _id } = req.user;
   User.findById({ _id })
     .then((user) => res.send(user))
     .catch((err) => {
       console.error(err);
-      return res.status(internalError.code).send(internalError.text);
+      next(err);
     });
 };
 
-const updateCurrentUser = (req, res) => {
+const updateCurrentUser = (req, res, next) => {
   const { _id } = req.user;
   const { name, avatar } = req.body;
   User.findByIdAndUpdate(
@@ -84,9 +95,13 @@ const updateCurrentUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(badRequest.code).send(badRequest.text);
+        next(
+          new BadRequestError(
+            "The request could not be processed due to invalid input data."
+          )
+        );
       }
-      return res.status(internalError.code).send(internalError.text);
+      next(err);
     });
 };
 
