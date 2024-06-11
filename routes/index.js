@@ -2,7 +2,7 @@ const router = require("express").Router();
 const itemRouter = require("./items");
 const likeRouter = require("./likes");
 const userRouter = require("./users");
-const { notFound } = require("../utils/errors");
+const { NotFoundError } = require("../utils/errors");
 const { createUser, login } = require("../controllers/users");
 
 router.post("/signin", login);
@@ -12,6 +12,8 @@ router.use("/items", likeRouter);
 router.use("/users", userRouter);
 
 // Defensive code
-router.use((req, res) => res.status(notFound.code).send(notFound.text));
+router.use(() => {
+  throw new NotFoundError("The Requested resource was not found.");
+});
 
 module.exports = router;

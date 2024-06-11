@@ -1,9 +1,12 @@
 const jwt = require("jsonwebtoken");
 const { jwtToken } = require("../utils/config");
-const { unauthorized } = require("../utils/errors");
+const { UnauthorizedError } = require("../utils/errors");
 
-const handleAuthError = (res) =>
-  res.status(unauthorized.code).send(unauthorized.text);
+const handleAuthError = () => {
+  throw new UnauthorizedError(
+    "Unauthorized, you must provide valid credentials to access this resource"
+  );
+};
 
 const extractBearerToken = (authorization) =>
   authorization.replace("Bearer ", "");
@@ -12,7 +15,7 @@ const auth = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith("Bearer ")) {
-    return handleAuthError(res);
+    return handleAuthError();
   }
 
   const token = extractBearerToken(authorization);
@@ -22,7 +25,7 @@ const auth = (req, res, next) => {
   try {
     payload = jwt.verify(token, jwtToken);
   } catch (err) {
-    return handleAuthError(res);
+    return handleAuthError();
   }
 
   req.user = payload;
