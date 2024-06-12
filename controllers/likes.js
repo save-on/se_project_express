@@ -1,5 +1,7 @@
 const ClothingItem = require("../models/clothingItem");
-const { created, BadRequestError, NotFoundError } = require("../utils/errors");
+const { created } = require("../utils/errors");
+const BadRequestError = require("../utils/errorclasses/BadRequestError");
+const NotFoundError = require("../utils/errorclasses/NotFoundError");
 
 const likeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(

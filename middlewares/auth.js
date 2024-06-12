@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { jwtToken } = require("../utils/config");
-const { UnauthorizedError } = require("../utils/errors");
+const UnauthorizedError = require("../utils/errorclasses/UnauthorizedError");
 
 const handleAuthError = () => {
   throw new UnauthorizedError(
